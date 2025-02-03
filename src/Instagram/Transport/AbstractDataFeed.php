@@ -57,11 +57,19 @@ abstract class AbstractDataFeed
         CacheResponse::setResponse($res);
 
         $data = (string)$res->getBody();
-        $data = json_decode($data);
-
-        if ($data === null) {
-            throw new InstagramFetchException(json_last_error_msg());
+        
+        // Sanitize JSON response
+        $data = preg_replace('/[\x00-\x1F\x7F-\xFF]/', '', $data);
+        $data = preg_replace('/[\x00-\x1F\x7F]//', '', $data);
+        $data = preg_replace('/[\xA0]/u', ' ', $data); // Convert non-breaking spaces
+        
+        $decoded = json_decode($data);
+        
+        if ($decoded === null) {
+            throw new InstagramFetchException('JSON decode failed: ' . json_last_error_msg() . '. Raw data: ' . substr($data, 0, 100) . '...');
         }
+        
+        $data = $decoded;
 
         return $data;
     }
@@ -94,11 +102,19 @@ abstract class AbstractDataFeed
         CacheResponse::setResponse($res);
 
         $data = (string)$res->getBody();
-        $data = json_decode($data);
-
-        if ($data === null) {
-            throw new InstagramFetchException(json_last_error_msg());
+        
+        // Sanitize JSON response
+        $data = preg_replace('/[\x00-\x1F\x7F-\xFF]/', '', $data);
+        $data = preg_replace('/[\x00-\x1F\x7F]//', '', $data);
+        $data = preg_replace('/[\xA0]/u', ' ', $data); // Convert non-breaking spaces
+        
+        $decoded = json_decode($data);
+        
+        if ($decoded === null) {
+            throw new InstagramFetchException('JSON decode failed: ' . json_last_error_msg() . '. Raw data: ' . substr($data, 0, 100) . '...');
         }
+        
+        $data = $decoded;
 
         return $data;
     }
